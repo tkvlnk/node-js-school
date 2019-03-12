@@ -59,11 +59,9 @@ createConnection({
   }, next) => {
     await next();
 
-    if (response.status >= 400) {
-      return;
-    }
+    const wrapName = response.status < 400 ? 'data' : 'errors';
 
-    response.body = {data: response.body};
+    response.body = { [wrapName] : response.body};
   });
 
   // JWT middleware -> below this line routes are only reached if JWT token is valid, secret as env variable
