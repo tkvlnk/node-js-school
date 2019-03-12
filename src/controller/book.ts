@@ -38,6 +38,7 @@ export default class BookController {
     const bookToBeSaved: Book = new Book();
     bookToBeSaved.name = ctx.request.body.name;
     bookToBeSaved.description = ctx.request.body.description;
+    bookToBeSaved.date = ctx.request.body.date;
     bookToBeSaved.user = userToBeAttached;
 
     const errors: ValidationError[] = await validate(bookToBeSaved);
@@ -48,7 +49,10 @@ export default class BookController {
       return;
     }
 
-    const { user, ...book } = await bookRepository.save(bookToBeSaved);
+    const {id: newBookId} = await bookRepository.save(bookToBeSaved);
+
+    const book = await bookRepository.findOne(newBookId);
+
     ctx.status = OK;
     ctx.body = book;
   }

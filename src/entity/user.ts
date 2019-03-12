@@ -20,6 +20,6 @@ export class User {
     @IsEmail()
     email: string;
 
-    @OneToMany(type => Book, book => book.user)
+    @OneToMany(() => Book, book => book.user)
     books: Book[];
 }

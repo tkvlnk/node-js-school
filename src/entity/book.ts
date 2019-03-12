@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Length } from 'class-validator';
+import { IsDateString, Length } from 'class-validator';
 import { User } from './user';
 
 @Entity()
@@ -19,6 +19,12 @@ export class Book {
   @Length(10, 80)
   description: string;
 
-  @ManyToOne(type => User, user => user.books)
+  @Column({
+    type: 'timestamp without time zone'
+  })
+  @IsDateString()
+  date: string;
+
+  @ManyToOne(() => User, user => user.books)
   user: User;
 }
