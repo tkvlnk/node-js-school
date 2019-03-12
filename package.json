@@ -15,9 +15,12 @@
     "node": "8.x.x",
     "npm": "5.x.x"
   },
-  "author": "Javier Aviles",
+  "author": {
+    "name": "Tit Kovalenko",
+    "email": "t.a.kvlnk@gmail.com"
+  },
   "license": "MIT",
-  "repository": "github:javieraviles/node-typescript-koa-rest",
+  "repository": "github.com:tkvlnk/node-js-school.git",
   "devDependencies": {
     "@types/dotenv": "^4.0.3",
     "@types/koa": "2.0.44",
