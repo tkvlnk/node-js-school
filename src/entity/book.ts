@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { IsDateString, Length } from 'class-validator';
 import { User } from './user';
 
@@ -20,7 +20,11 @@ export class Book {
   description: string;
 
   @Column({
-    type: 'timestamp without time zone'
+    type: 'timestamp without time zone',
+    transformer: {
+      to: v => v,
+      from: v => v.toISOString(),
+    },
   })
   @IsDateString()
   date: string;

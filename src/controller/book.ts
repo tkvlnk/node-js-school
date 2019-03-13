@@ -6,9 +6,8 @@ import { validate, ValidationError } from 'class-validator';
 import { BAD_REQUEST, OK, NOT_FOUND } from 'http-status';
 
 export default class BookController {
-  public static async getUserBooks(ctx) {
+  public static async getUsersBooks(ctx: BaseContext) {
     const manager = getManager();
-
     const bookRepository: Repository<Book> = manager.getRepository(Book);
 
     const books: Book[] = await bookRepository.find({
@@ -21,9 +20,8 @@ export default class BookController {
     ctx.body = books;
   }
 
-  public static async createBook(ctx: BaseContext) {
+  public static async createUsersBook(ctx: BaseContext) {
     const manager = getManager();
-
     const userRepository: Repository<User> = manager.getRepository(User);
     const bookRepository: Repository<Book> = manager.getRepository(Book);
 
@@ -55,5 +53,77 @@ export default class BookController {
 
     ctx.status = OK;
     ctx.body = book;
+  }
+
+  public static async deleteUsersBook(ctx: BaseContext) {
+    const manager = getManager();
+    const bookRepository: Repository<Book> = manager.getRepository(Book);
+
+    const bookToDelete = await bookRepository.findOne({
+      id: ctx.params.bookId,
+      user: {
+        id: ctx.params.userId,
+      },
+    });
+
+    if (!bookToDelete) {
+      ctx.status = NOT_FOUND;
+      ctx.body = 'The book you trying to delete does not exist';
+      return;
+    }
+
+    await bookRepository.delete(ctx.params.bookId);
+  }
+
+  public static async updateUsersBook(ctx: BaseContext) {
+    const manager = getManager();
+    const bookRepository: Repository<Book> = manager.getRepository(Book);
+
+    const bookToUpdate = await bookRepository.findOne({
+      id: ctx.params.bookId,
+      user: {
+        id: ctx.params.userId,
+      },
+    });
+
+    if (!bookToUpdate) {
+      ctx.status = NOT_FOUND;
+      ctx.body = 'The book you trying to update does not exist';
+      return;
+    }
+
+    const propsWhiteList = [
+      'name',
+      'description',
+      'date',
+    ];
+
+    Object.entries(ctx.request.body).forEach(([key, value]) => {
+      if (!propsWhiteList.includes(key)) {
+        return;
+      }
+
+      bookToUpdate[key] = value;
+    });
+
+    const errors: ValidationError[] = await validate(bookToUpdate);
+
+    if (errors.length > 0) {
+      ctx.status = BAD_REQUEST;
+      ctx.body = errors;
+      return;
+    }
+
+    await bookRepository.save(bookToUpdate);
+
+    const updatedBook = await bookRepository.findOne({
+      id: ctx.params.bookId,
+      user: {
+        id: ctx.params.userId,
+      },
+    });
+
+    ctx.status = OK;
+    ctx.body = updatedBook;
   }
 }
